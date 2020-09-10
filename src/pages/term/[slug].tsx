@@ -43,30 +43,41 @@ const TermPage: React.FC<PageProps> = ({ term }) => {
     return <DefaultErrorPage statusCode={404} />;
   }
 
-  console.log('ct', clientTerm);
   return (
     <Layout>
       <div className="container mx-auto px-4 pt-16">
         <h1 className="text-4xl font-bold tracking-tight mb-8">{term.title}</h1>
-        <div className="max-w-xl font-serif text-gray-800 leading-7">
-          {term.text}
-        </div>
-        <div className="mt-8 flex">
-          {clientTerm ? (
-            <button
-              onClick={!liked ? onLike : null}
-              className="mr-2 focus:outline-none"
-            >
-              <Heart className={liked ? 'activeHeart' : 'heart'} />
-            </button>
-          ) : (
-            <div className="mr-2">
-              <Heart className={liked ? 'activeHeart' : 'heart'} />
+        <div className="max-w-xl">
+          <div className="font-serif text-gray-800 leading-7">{term.text}</div>
+          <div className="flex mt-8">
+            <div className="flex">
+              {clientTerm ? (
+                <button
+                  onClick={!liked ? onLike : null}
+                  className="mr-2 focus:outline-none"
+                >
+                  <Heart className={liked ? 'activeHeart' : 'heart'} />
+                </button>
+              ) : (
+                <div className="mr-2">
+                  <Heart className={liked ? 'activeHeart' : 'heart'} />
+                </div>
+              )}
+              <span className={liked ? 'text-black' : 'text-gray-600'}>
+                {clientTerm?.likes || term.likes}
+              </span>
             </div>
-          )}
-          <span className={liked ? 'text-black' : 'text-gray-600'}>
-            {clientTerm?.likes || term.likes}
-          </span>
+            <div className="ml-auto">
+              <a
+                href={term.link}
+                title={`Find out more about ${term.title}`}
+                target="_blank"
+                className="text-sm text-gray-600 underline hover:text-purple-600 hover:no-underline"
+              >
+                More…
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </Layout>
