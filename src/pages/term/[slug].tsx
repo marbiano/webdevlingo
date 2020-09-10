@@ -7,7 +7,6 @@ import { Term } from '../../lib/types';
 import Layout from '../../components/Layout';
 import Heart from '../../components/Heart';
 import { useTerm } from '../../lib/hooks/use-term';
-import client from '../../lib/sanity';
 
 interface PageProps {
   term?: Term;
