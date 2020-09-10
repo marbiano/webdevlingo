@@ -50,7 +50,7 @@ export async function fetchTermBySlug(slug) {
   return data;
 }
 
-export async function mutateTermLikes(slug: string, value: number) {
+export async function mutateTermLikes({ slug, value }) {
   const data = await mutateAPI({
     endpoint: `/${slug}`,
     method: 'PATCH',

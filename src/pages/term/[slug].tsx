@@ -2,26 +2,38 @@ import { useState } from 'react';
 import { GetStaticProps, GetStaticPaths } from 'next';
 import { useRouter } from 'next/router';
 import DefaultErrorPage from 'next/error';
-import { fetchAllTerms, fetchTermBySlug, mutateTermLikes } from '../../lib/api';
+import { fetchAllTerms, fetchTermBySlug } from '../../lib/api';
 import { Term } from '../../lib/types';
 import Layout from '../../components/Layout';
-import styles from '../../styles/blocks.module.css';
 import Heart from '../../components/Heart';
+import { useTerm } from '../../lib/hooks/use-term';
+import client from '../../lib/sanity';
 
 interface PageProps {
   term?: Term;
 }
 
+const normalizeSlug = (slug: string[] | string | undefined) =>
+  Array.isArray(slug) ? slug[0] : slug;
+
 const TermPage: React.FC<PageProps> = ({ term }) => {
   const [liked, setLiked] = useState(false);
   const router = useRouter();
   const { isFallback, query } = router;
+  const { slug } = query;
+  const realSlug = normalizeSlug(slug);
 
-  const onClick = async (e) => {
-    e.stopPropagation();
-    const slug = Array.isArray(query.slug) ? query.slug[0] : query.slug;
-    await mutateTermLikes(slug, term.likes + 1);
-    setLiked(true);
+  const { useTermQuery, mutateLikes } = useTerm(normalizeSlug(realSlug));
+
+  const { data: clientTerm, isLoading, isError } = useTermQuery();
+  const [mutate] = mutateLikes(() => setLiked(true));
+
+  const onLike = async () => {
+    try {
+      await mutate({ slug: realSlug, value: clientTerm.likes + 1 });
+    } catch {
+      // Uh oh, something went wrong
+    }
   };
 
   if (isFallback) {
@@ -32,6 +44,7 @@ const TermPage: React.FC<PageProps> = ({ term }) => {
     return <DefaultErrorPage statusCode={404} />;
   }
 
+  console.log('ct', clientTerm);
   return (
     <Layout>
       <div className="container mx-auto px-4 pt-16">
@@ -40,13 +53,21 @@ const TermPage: React.FC<PageProps> = ({ term }) => {
           {term.text}
         </div>
         <div className="mt-8 flex">
-          <div onClick={onClick} className="mr-2">
-            <Heart className={liked ? 'activeHeart' : 'heart'} />
-          </div>
-          {term.likes}
-          {/* <button type="button" onClick={onClick}>
-            Like
-          </button>{' '} */}
+          {clientTerm ? (
+            <button
+              onClick={!liked ? onLike : null}
+              className="mr-2 focus:outline-none"
+            >
+              <Heart className={liked ? 'activeHeart' : 'heart'} />
+            </button>
+          ) : (
+            <div className="mr-2">
+              <Heart className={liked ? 'activeHeart' : 'heart'} />
+            </div>
+          )}
+          <span className={liked ? 'text-black' : 'text-gray-600'}>
+            {clientTerm?.likes || term.likes}
+          </span>
         </div>
       </div>
     </Layout>
