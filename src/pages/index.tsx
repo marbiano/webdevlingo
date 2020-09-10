@@ -6,7 +6,9 @@ import { Term } from '../lib/types';
 import Layout from '../components/Layout';
 
 interface PageProps {
-  terms: Term[];
+  terms: {
+    [key: string]: Term;
+  };
 }
 
 const Home: React.FC<PageProps> = ({ terms }) => {
@@ -14,15 +16,18 @@ const Home: React.FC<PageProps> = ({ terms }) => {
     <Layout showcase>
       <div className="container mx-auto px-4 pt-16">
         <ul className="divide-y divide-gray-400">
-          {terms.map((term) => (
-            <li key={term._id} className="text-lg">
-              <Link href={`/term/${term.slug.current}`}>
-                <a className="block px-4 py-4 hover:bg-gray-200">
-                  {term.title}
-                </a>
-              </Link>
-            </li>
-          ))}
+          {Object.keys(terms).map((slug) => {
+            const term = terms[slug];
+            return (
+              <li key={slug} className="text-lg">
+                <Link href={`/term/${slug}`}>
+                  <a className="block px-4 py-4 hover:bg-gray-200">
+                    {term.title}
+                  </a>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </Layout>

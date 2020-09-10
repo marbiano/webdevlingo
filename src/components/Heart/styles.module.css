@@ -1,0 +1,14 @@
+.heart {
+  width: 24px;
+  color: #dfd9d9;
+  cursor: pointer;
+}
+
+.heart:hover {
+  color: #bbaaaa;
+}
+
+.activeHeart {
+  width: 24px;
+  color: #bb1b1b;
+}
